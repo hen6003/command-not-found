@@ -1,0 +1,30 @@
+#!/bin/sh
+get_line() {
+    tail -n+"$1" | head -1
+}
+
+command="$1"
+
+if [ -z "$command" ]; then
+    printf "\033[31mExpected command to find\033[m\n" 1>&2
+    exit 1
+fi
+
+package="$(xlocate "$command" | grep bin | cut -d' ' -f1)"
+package_info="$(xbps-query -R pfetch --property=maintainer,homepage,license,short_desc)"
+package_maintainer="$(echo "$package_info" | get_line 1)"
+package_homepage="$(echo "$package_info" | get_line 2)"
+package_license="$(echo "$package_info" | get_line 3)"
+package_short_desc="$(echo "$package_info" | get_line 4)"
+
+printf "\033[1mFound \033[3m%s\033[23m in \033[3m%s\033[23m, package info:\n" "$command" "$package"
+printf "\033[1m  Maintainer\033[22m: \033[3m%s\033[23m\n" "$package_maintainer"
+printf "\033[1m  Homepage\033[22m: \033[3m%s\033[23m\n" "$package_homepage"
+printf "\033[1m  License\033[22m: \033[3m%s\033[23m\n" "$package_license"
+printf "\033[1m  Description\033[22m: \033[3m%s\033[23m\n" "$package_short_desc"
+printf "\033[1mInstall? (\033[22my/N\033[1m)\033[m "
+
+read -r input
+if [ "$input" = "y" ] || [ "$input" = "Y" ]; then
+    xi "$package"
+fi
