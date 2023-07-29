@@ -11,7 +11,7 @@ if [ -z "$command" ]; then
 fi
 
 package="$(xlocate "$command" | grep bin | cut -d' ' -f1)"
-package_info="$(xbps-query -R pfetch --property=maintainer,homepage,license,short_desc)"
+package_info="$(xbps-query -R "$package" --property=maintainer,homepage,license,short_desc)"
 package_maintainer="$(echo "$package_info" | get_line 1)"
 package_homepage="$(echo "$package_info" | get_line 2)"
 package_license="$(echo "$package_info" | get_line 3)"
